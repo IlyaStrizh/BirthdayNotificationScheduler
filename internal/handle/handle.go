@@ -548,7 +548,7 @@ func (h *Handle) checkEmployees(employees []db.Employee, t td.TDlib, b *tb.Bot, 
 				b.Send(&tb.Chat{ID: employee.TelegramID}, message)
 			}
 
-			newSubscribe := make(map[uuid.UUID]time.Time)
+			newSubscribe, flag := make(map[uuid.UUID]time.Time), false
 			// Проверяем время оповещания его подписок
 			for k, t := range employee.Subscribe {
 				newSubscribe[k] = t
@@ -572,10 +572,13 @@ func (h *Handle) checkEmployees(employees []db.Employee, t td.TDlib, b *tb.Bot, 
 						t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
 
 					newSubscribe[k] = newDateNotification
-					err = h.db.PatchEmployee(db.Employee{ID: employee.ID, Subscribe: newSubscribe}, "Subscribe")
-					if err != nil {
-						log.Println("Ошибка сохранения новой даты оповещания:", err)
-					}
+					flag = true
+				}
+			}
+			if flag {
+				err := h.db.PatchEmployee(db.Employee{ID: employee.ID, Subscribe: newSubscribe}, "Subscribe")
+				if err != nil {
+					log.Println("Ошибка сохранения новой даты оповещания:", err)
 				}
 			}
 		}
