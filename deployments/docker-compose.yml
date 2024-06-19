@@ -1,0 +1,20 @@
+
+version: '3'
+
+services:
+    postgres:
+        image: 'postgres'
+        container_name: 'apg'
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        volumes:
+            - 'apg:/var/lib/postgresql/data'
+            - '../csv:/var/lib/postgresql/csv'
+        ports:
+            - "5051:5432"
+
+volumes:
+    apg:
+        driver: local
